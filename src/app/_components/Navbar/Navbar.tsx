@@ -64,7 +64,7 @@ const Navbar = () => {
           </button>
         </div>
         <Popover.Group className="hidden lg:flex lg:gap-x-12">
-          <NavRoutes role={session?.user?.role} />
+          <NavbarGroup role={session?.user?.role}/>
         </Popover.Group>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <Link
