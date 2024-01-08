@@ -63,16 +63,17 @@ enum UserRole {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String     @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?    @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
-    role          UserRole  @default(USER)
-    forms         Form[]
+    role          UserRole   @default(USER)
+    answers       Answer[]
+    userForms     UserForm[]
 }
 
 model VerificationToken {
@@ -84,38 +85,64 @@ model VerificationToken {
 }
 
 model Form {
-    id          String     @id @default(cuid())
-    title       String
-    description String?
-    createdAt   DateTime   @default(now())
-    updatedAt   DateTime   @updatedAt
-    questions   Question[]
-    User        User?      @relation(fields: [userId], references: [id])
-    userId      String?
+    id           String        @id @default(cuid())
+    title        String
+    description  String?
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    userForms    UserForm[]
+    formSections FormSection[]
+}
+
+model FormSection {
+    formId    String
+    sectionId String
+    order     Int
+    form    Form    @relation(fields: [formId], references: [id])
+    section Section @relation(fields: [sectionId], references: [id])
+
+    @@id([formId, sectionId])
+}
+
+model Section {
+    id           String        @id @default(cuid())
+    title        String
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    questions    Question[]
+    formSections FormSection[]
 }
 
 model Question {
-    id           String   @id @default(cuid())
-    formId       String
-    form         Form     @relation(fields: [formId], references: [id])
-    questionText String
-    questionType String // e.g., 'option', 'text', 'checkbox', etc.
-    isRequired   Boolean
-    answer       Answer? // One-to-one relationship with Answer
-    options      Option[] // Relevant only for certain question types
+    id        String   @id @default(cuid())
+    title     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    answers   Answer[]
+    Section   Section? @relation(fields: [sectionId], references: [id])
+    sectionId String?
+}
+
+model UserForm {
+    userId  String
+    user    User     @relation(fields: [userId], references: [id])
+    formId  String
+    form    Form     @relation(fields: [formId], references: [id])
+    answers Answer[]
+
+    @@id([userId, formId])
 }
 
 model Answer {
-    id         String   @id @default(cuid())
-    questionId String   @unique
-    answer     String // Answer content, can be adjusted to Json if needed for complex structures
-    question   Question @relation(fields: [questionId], references: [id])
-}
-
-model Option {
-    id         String   @id @default(cuid())
-    questionId String
-    optionText String
-    question   Question @relation(fields: [questionId], references: [id])
-    isSelected Boolean  @default(false)
+    id             String    @id @default(cuid())
+    value          String
+    questionId     String
+    question       Question  @relation(fields: [questionId], references: [id])
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+    User           User?     @relation(fields: [userId], references: [id])
+    userId         String?
+    UserForm       UserForm? @relation(fields: [userFormUserId, userFormFormId], references: [userId, formId])
+    userFormUserId String?
+    userFormFormId String?
 }
