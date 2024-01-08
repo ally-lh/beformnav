@@ -12,7 +12,7 @@ export const NavbarRoutes = [
   {
     label: "Dashboard",
     desc: "Admin Dashboard",
-    url: "/admin",
+    url: "/admin/dashboard",
     role: ["ADMIN"],
   },
   {
