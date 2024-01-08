@@ -1,21 +1,17 @@
+"use client";
+
 import "@/styles/globals.css";
 
-import { Inter } from "next/font/google";
-import { cookies } from "next/headers";
 import { useSession } from "next-auth/react";
-import { getServerAuthSession } from "@/server/auth";
-import SessionProvider from "@/app/_components/SessionProvider";
-
-import { TRPCReactProvider } from "@/trpc/react";
 import { redirect } from "next/navigation";
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerAuthSession();
-  if (!session || session.user.role !== "ADMIN") {
+  const session = useSession();
+  if (!session || session.data?.user.role !== "ADMIN") {
     redirect("/api/auth/signin");
   }
 

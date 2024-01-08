@@ -1,28 +1,20 @@
+"use client";
+
 import "@/styles/globals.css";
 
-import { Inter } from "next/font/google";
-import { cookies } from "next/headers";
 import { useSession } from "next-auth/react";
-import { getServerAuthSession } from "@/server/auth";
-import SessionProvider from "@/app/_components/SessionProvider";
 
-import { TRPCReactProvider } from "@/trpc/react";
 import { redirect } from "next/navigation";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-export default async function UserLayout({
+export default function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerAuthSession();
+  const session = useSession();
   console.log(session);
 
-  if (!session || session.user.role !== "USER") {
+  if (!session || session.data?.user.role !== "USER") {
     redirect("/api/auth/signin");
   }
 
